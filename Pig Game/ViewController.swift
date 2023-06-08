@@ -8,6 +8,8 @@
 import UIKit
 
 class ViewController: UIViewController {
+    
+    var currentRoll = 0
 
     @IBOutlet weak var scoreView: UILabel!
     
@@ -23,7 +25,7 @@ class ViewController: UIViewController {
         return Int.random(in: 1...6)
     }
     
-    func randomiseDiceImage(diceImageView: UIImageView, roll: Int) {
+    func updateDiceImage(diceImageView: UIImageView, roll: Int) {
         let randomImageName = "dice" + String(roll)
         diceImageView.image = UIImage(imageLiteralResourceName: randomImageName)
     }
@@ -34,29 +36,77 @@ class ViewController: UIViewController {
         turnsView.text = String(turns + 1)
     }
     
-    func updateCurrentScore(roll: Int) {
-        guard let currentScoreText = currentScoreView.text else { return
+    func setCurrentScore(score: Int) {
+        currentScoreView.text = String(score)
+    }
+    
+    func getCurrentScore() -> Int {
+        guard let currentScoreText = currentScoreView.text else { return 0
         }
-        guard let currentScore = Int(currentScoreText) else { return }
-        print(currentScore)
-        print(roll)
-        currentScoreView.text = String(currentScore + roll)
-        print(currentScore + roll)
-        print()
+        guard let currentScore = Int(currentScoreText) else {
+            return 0
+        }
+        return currentScore
+    }
+    
+    func updateCurrentScore() {
+        setCurrentScore(score: (getCurrentScore() + currentRoll))
+    }
+    
+    func getSavedScore() -> Int {
+        guard let savedScoreText = scoreView.text else {
+            return 0
+        }
+        guard let savedScore = Int(savedScoreText) else {
+            return 0
+        }
+        return savedScore
+    }
+    
+    func setSavedScore(score: Int) {
+        scoreView.text = String(score)
     }
     
     func rollDice(diceImageView: UIImageView) {
         let roll = getDiceRoll()
-        incrementTurns()
-        updateCurrentScore(roll: roll)
-        randomiseDiceImage(diceImageView: diceImageView, roll: roll)
+        updateDiceImage(diceImageView: diceImageView, roll: roll)
+        currentRoll += roll
     }
     
     @IBAction func rollButtonTapped(_ sender: UIButton) {
+        if getSavedScore() >= 100 {
+            return
+        }
+        
         rollDice(diceImageView: diceImageView1)
+        
+        let roll1 = currentRoll
+        
+        if roll1 == 1 {
+            setCurrentScore(score: 0)
+        } else {
+            rollDice(diceImageView: diceImageView2)
+            
+            let roll2 = currentRoll - roll1
+            
+            if currentRoll == 2 {
+                setCurrentScore(score: 0)
+                setSavedScore(score: 0)
+            } else if roll2 == 1 {
+                setCurrentScore(score: 0)
+            } else {
+                updateCurrentScore()
+            }
+            
+            currentRoll = 0
+        }
+        
+        incrementTurns()
     }
     
     @IBAction func holdButtonTapped(_ sender: UIButton) {
+        setSavedScore(score: getSavedScore() + getCurrentScore())
+        setCurrentScore(score: 0)
     }
 }
 
