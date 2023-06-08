@@ -82,24 +82,20 @@ class ViewController: UIViewController {
         
         let roll1 = currentRoll
         
-        if roll1 == 1 {
+        rollDice(diceImageView: diceImageView2)
+        
+        let roll2 = currentRoll - roll1
+        
+        if currentRoll == 2 {
+            setCurrentScore(score: 0)
+            setSavedScore(score: 0)
+        } else if roll1 == 1 || roll2 == 1 {
             setCurrentScore(score: 0)
         } else {
-            rollDice(diceImageView: diceImageView2)
-            
-            let roll2 = currentRoll - roll1
-            
-            if currentRoll == 2 {
-                setCurrentScore(score: 0)
-                setSavedScore(score: 0)
-            } else if roll2 == 1 {
-                setCurrentScore(score: 0)
-            } else {
-                updateCurrentScore()
-            }
-            
-            currentRoll = 0
+            updateCurrentScore()
         }
+        
+        currentRoll = 0
         
         incrementTurns()
     }
